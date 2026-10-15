@@ -1,0 +1,19 @@
+# thư viện — máy mới tự chạy "npm install"
+node_modules/
+
+# việc đang làm: mỗi video một thư mục trong _jobs, không đưa lên kho
+dang5-studio/public/_jobs/*
+!dang5-studio/public/_jobs/DOC-TRUOC.txt
+
+# thành phẩm và kho riêng
+dang5-studio/OUTPUT/
+dang5-studio/KHO_BROLL/
+dang5-studio/public/broll/
+
+# file tạm
+_props.json
+_thu.*
+Thumbs.db
+desktop.ini
+.DS_Store
+*.tmp

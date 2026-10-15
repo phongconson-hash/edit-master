@@ -1,0 +1,19 @@
+{
+  "name": "dang4-studio",
+  "private": true,
+  "description": "Dạng 4 \"Mono Bold\" — bộ dựng video talking-head (Remotion + Python)",
+  "scripts": {
+    "studio": "remotion studio src/index.ts",
+    "render": "remotion render src/index.ts dang4"
+  },
+  "dependencies": {
+    "@remotion/cli": "4.0.487",
+    "remotion": "4.0.487",
+    "react": "^19.2.7",
+    "react-dom": "^19.2.7"
+  },
+  "devDependencies": {
+    "typescript": "^5.6.0",
+    "@types/react": "^19.0.0"
+  }
+}
