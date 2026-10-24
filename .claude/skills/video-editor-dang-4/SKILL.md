@@ -1,81 +1,87 @@
 ---
 name: video-editor-dang-4
-description: Dạng 4 — edit talking-head kiểu "MONO BOLD" (reel chuyên gia/coach: cận mặt lọc ấm, chữ trắng đậm 2 tầng, thẻ trắng–đen) của anh Phong, Claude là đầu não. Kích hoạt khi anh nói "edit Dạng 4", "làm Dạng 4", "edit kiểu trắng đen", "edit giống kênh reel chuyên gia", "thẻ trắng thẻ đen", "chữ đậm trắng bóng đổ". Đặc trưng - (1) cận mặt + BỘ LỌC ẤM mềm (bão hoà thấp, tối 4 góc, hạt phim), (2) chữ Inter đậm trắng 2 tầng đặt thấp ~70% khung, cả cụm bật một lần, bóng đổ mềm, KHÔNG màu nhấn, (3) B-ROLL đời thật phủ kín màn hình minh hoạ câu nói, (4) THẺ TRẮNG chữ đen / THẺ ĐEN chữ trắng toàn màn cho câu chốt, thẻ trắng trồi từ đáy, (5) nhạc nền êm RẤT NHỎ, gần như không SFX. Khác Dạng 1 (đỏ-trắng, thẻ giấy), Dạng 2 (hồng kể chuyện), Dạng 3 (mint, nhạc to, nhiều SFX). TUYỆT ĐỐI KHÔNG XOÁ skill này.
+description: Dạng 4 "MONO BOLD" — edit video talking-head kiểu reel chuyên gia/coach, Claude là đạo diễn. Kích hoạt khi người dùng nói "edit Dạng 4", "làm Dạng 4", "edit kiểu trắng đen", "edit giống reel chuyên gia", "thẻ trắng thẻ đen", "chữ đậm trắng bóng đổ", hoặc đưa video người nói mà không nói dạng nào (Dạng 4 là dạng mặc định). Đặc trưng - cận mặt bộ lọc ấm + làm nét nhân vật; chữ Inter trắng đậm 2 tầng đặt thấp; b-roll đời thật phủ kín hoặc màn hình đặt khung giữa; thẻ TRẮNG chữ đen / thẻ ĐEN chữ trắng cho câu chốt; chuyển cảnh cháy đỏ-cam tối đa 2 lần; màn hình iPhone giả lập khi nói tới nhập câu lệnh; THANG XẾP HẠNG + KHUNG SO SÁNH + LOGO công cụ cho video đánh giá; nhạc nền rất nhỏ.
 ---
 
-# Video Editor — DẠNG 4 "Mono Bold"
-
-> ⛔ **KHÔNG XOÁ SKILL NÀY.** (Skill "video-editor-dang-4" kiểu CŨ của app Clipsale đã bỏ 10/10/2026 — đây là Dạng 4 MỚI, tạo 13–14/10/2026.)
-> Bóc tách 4 video kênh mẫu: [references/phan-tich-video-mau.md](references/phan-tich-video-mau.md) · khung mẫu (chỉ có ở bản nội bộ) · video + script đo ở `thư mục nghiên cứu trên máy chủ nhà\`
-> Ví dụ plan: `dang5-studio/public/_jobs/d4-test/make_plan.py`
+# Video Editor — DẠNG 4 "Mono Bold" (bản đầy đủ, 24/10/2026)
 
 ## Vai trò
-Claude = đạo diễn: đọc lời → chia cảnh (mặt / b-roll / thẻ), viết chữ 2 tầng, chọn câu chốt lên thẻ, chọn b-roll đúng ý → `plan.json`. Máy thi hành.
+Claude = đạo diễn: nghe lời → soát lời → chia cảnh (mặt / b-roll / thẻ / điện thoại / thang / so sánh) → viết chữ 2 tầng → chọn câu chốt lên thẻ → `plan.json`. Máy (`dang5-studio/`) thi hành.
 
-## Công cụ — chung thư mục `dang5-studio\`
-- `scripts/prepare.py` như các dạng khác. `src/Dang4Mono.tsx` = composition **`dang4`** (plan cần `"comp": "dang4"`). `scripts/render.py <job>` (chạy nền nếu video >2 phút).
-- Phông: `public/fonts/Inter[opsz,wght].ttf`. Hạt phim: `public/tex/grain.png`.
-- Nhạc mặc định: **`wholesome`** (Kevin MacLeod, CC BY 4.0 — nền êm, năng lượng dồn 150–800 Hz giống mẫu; đăng video phải ghi tên tác giả). `gainDb −11`, duck sâu (mặc định) → nhạc nằm ~13 dB dưới giọng như mẫu.
-- B-roll: kho của anh (`python scripts/kho_broll.py tim …`). Dạng 4 cần clip ĐỜI THẬT, phủ kín 9:16 — clip ngang sẽ bị cắt hai bên, chọn clip có chủ thể ở giữa hoặc đặt `pos`.
+## Công cụ — thư mục `dang5-studio/`
+| Lệnh | Làm gì |
+|---|---|
+| `python scripts/prepare.py <video> --job <ten>` | Nhận lời (faster-whisper, mốc từng từ) + cắt lặng → `cut.mp4`, `words.json` |
+| `python scripts/trim_gaps.py <job> --min 0.55 --chua 0.28` | Cắt thêm khoảng nghỉ còn dài (nếu có) — chạy TRƯỚC grade |
+| `python scripts/grade.py <job> --manh 0.85 --net 1.0` | Bộ lọc màu `mint-warm` + làm nét nhân vật → `cut_graded.mp4` |
+| `python scripts/do_mat.py <job>` | Đo vị trí mặt (đỉnh đầu · tâm · cằm) → đặt khung và chữ cho đúng. Cần `pip install mediapipe opencv-python` |
+| `python scripts/render.py <job>` | Dựng `plan.json` → `final.mp4` (chạy nền nếu video > 2 phút) |
+| `npx remotion still src/index.ts dang4 out.png --props=public/_jobs/<job>/_props.json --frame=N` | Soi 1 khung trước khi dựng cả video. Nhớ chép `plan.json` → `_props.json` trước mỗi lần (render.py xoá file này khi xong) |
 
-## 5 trụ cột
-1. **Mặt + bộ lọc ấm**: mọi cảnh quay qua `GRADE` (bão hoà 0,86, sepia 0,16, phủ ấm, tối góc 0,4, hạt 0,06). Đổi cỡ khung bằng `scale` giữa các cảnh nói (1,0 ↔ 1,10–1,12), không zoom mượt.
-2. **Chữ 2 tầng trắng đậm**, `y` mặc định 0,70 (mặt thấp/đứng xa: 0,76). `lead` = dòng nhỏ (≤26 ký tự), `punch` = cụm to (≤13 ký tự, dài hơn renderer tự thu cỡ). Cả cụm bật một lần. KHÔNG khối màu, KHÔNG từng từ.
-3. **B-roll phủ kín** cho câu tả bối cảnh/nỗi đau/bằng chứng; chữ vẫn chạy trên b-roll.
-4. **Thẻ trắng/đen** cho câu chốt — `tone`, `small`, `big`, `tBig` (lúc cụm to hiện), `order`. Thẻ trắng mặc định `enter: "wipe"` (trồi từ đáy), thẻ đen `"cut"`. Hay đi cặp trắng→đen. Trên thẻ không có chữ chạy.
-5. **Âm tiết chế**: nhạc rất nhỏ; SFX chỉ 1 tiếng lướt −22 dB khi thẻ trắng trồi lên (plan tự sinh).
+Composition **`dang4`** (`src/Dang4Mono.tsx`), plan phải có `"comp": "dang4"`, `"graded": true` khi dùng `cut_graded.mp4`.
+Phông Inter · hạt phim `tex/grain.png` · nhạc `wholesome` (Kevin MacLeod, CC BY 4.0 — đăng video phải ghi tên tác giả) · logo công cụ ở `public/logos/`.
 
-## ✨ TIA SÁNG CHUYỂN CẢNH + DA ĐẸP (anh hỏi 14/10 — đã thêm vào bộ dựng)
-- **Tia sáng** (`leaks: [{t, kind}]`): kênh mẫu dùng ở 1–2 mốc cắt QUAN TRỌNG mỗi video (thường ngay sau hook, giây 3–6; đôi khi lúc đổi người nói), KHÔNG dùng ở mọi lần cắt — reel A không có lần nào. Dài ~11 khung: sáng dần 4–5 khung → trắng gần kín đúng mốc cắt → tan 5–6 khung. 2 kiểu: `prism` (luồng sáng trắng tràn từ trái, mép cầu vồng — reel C 5,4s, D 2,8s) và `warm` (cháy đỏ→cam→trắng — video B 5,5s, 19,1s). Kèm 1 tiếng lướt nhẹ −20 dB sớm 0,15s. Tối đa 2 lần/video.
-- **Da đẹp, trong**: mẫu = (1) ánh sáng mềm chiếu thẳng mặt (cửa sổ/đèn vòng), (2) làm mịn da kiểu beauty/retouch của app quay hoặc CapCut — lỗ chân lông và nếp nhỏ mất nhưng mắt, môi, gọng kính vẫn nét, (3) nhấc sáng vùng da + màu ấm nhạt. Em chỉ suy được từ hình, không biết chính xác họ dùng app nào.
-  → `python scripts/beauty.py <job> [--strength 1.0]` tạo `cut_beauty.mp4` (bilateral 2 lượt giữ viền + trộn 25% gốc + nhấc trung tính + làm nét nhẹ); plan đặt `"video": "_jobs/<job>/cut_beauty.mp4"`. Chỉ có tác dụng rõ khi anh quay CẬN MẶT; đừng tăng strength >1,2 (da nhựa). Lời khuyên khi quay: mặt hướng về nguồn sáng mềm, đừng để đèn trần chiếu từ trên xuống.
-- ★★ **ANH CHỐT 14/10 (luật hiện hành):** (1) cháy đỏ-cam CHỈ dùng ở mốc chuyển cảnh lớn hoặc ngay trước đoạn quan trọng — không rải đều, tối đa ~2 lần/video; (2) **LÀM MỊN DA: anh tự làm ở CapCut** → KHÔNG chạy `beauty.py`, plan dùng thẳng `cut.mp4`. Chỉ chạy `beauty.py` khi anh nói rõ video chưa qua CapCut và nhờ làm.
-- ★ **Anh chốt 14/10: hiệu ứng anh muốn là CHÁY ĐỎ-CAM** → `kind` mặc định = `"warm"` (đã chỉnh cho khớp mẫu: nhuộm đỏ thẫm → cam đậm 5 khung, vàng-trắng kín ở mốc cắt, lùi qua cam ~8 khung). `prism` chỉ dùng khi anh yêu cầu.
-- `beauty.py` là làm mịn TOÀN KHUNG (không nhận diện mặt): vải, tóc tơ, chữ nhỏ ở hậu cảnh cũng mềm đi chút; không xoá mụn riêng lẻ, không chỉnh dáng mặt. Anh đã retouch bằng CapCut/app quay thì KHÔNG chạy beauty nữa (hai lần = da nhựa).
-- Demo: `_jobs/d4-da/` (6 giây cận mặt: da đã làm mịn + 1 tia sáng prism). Tia sáng bản hiện tại thiên về chớp trắng, dải cầu vồng còn nhạt hơn mẫu.
+## Các loại cảnh (`scenes`, nối liền nhau không hở)
+| `kind` | Dùng khi | Ghi chú |
+|---|---|---|
+| `talk` | Người nói | `scale` 1,0 ↔ 1,06–1,10 đổi giữa các cảnh (không zoom trượt); `anchorY` |
+| `broll` | Clip DỌC đời thật phủ kín 9:16 | `file`, `pos` |
+| `photo` | Ảnh hoặc **clip màn hình 16:9** đặt khung giữa ~2/3, nền chính nó làm mờ | `file`, `w` (0,68–0,97). Clip ngang dùng cái này, đừng phủ kín (mất chữ màn hình) |
+| `card` | Câu chốt | `tone` white/black, `small`, `big`, `tBig`, `order`. Thẻ trắng trồi từ đáy, thẻ đen cắt thẳng |
+| `phone` | Nói tới **nhập câu lệnh** cho AI | iPhone 18 Pro + app ChatGPT: câu lệnh gõ dần, bấm gửi, nhận trả lời. `prompt`, `typeAt`, `send`, `tReply`, `reply` hoặc `replyPic`, `pics` (ảnh đính kèm), `logo` (đổi app). Bàn phím luôn hiện |
+| `ladder` | **Thang xếp hạng** — video đánh giá/xếp hạng | `level` = bậc đang nói (0 = tổng quan), `tLevel` = mốc bậc sáng lên, `title` ghi đè. Nội dung thang ở `plan.ladder` |
+| `compare` | **Khung so sánh** công cụ | `label`, `title`, `items:[{file,name,note,t}]`, `pick` + `tPick` (cái được chọn sáng trắng + nhãn cam), `pickText`. Không `pick` = ngang nhau |
 
-## 🎨 BỘ LỌC MÀU HỌC TỪ VIDEO MẪU + CHUYỂN CẢNH MƯỢT (anh yêu cầu 14/10: "chỉnh cho độ đẹp… bộ lọc, da, chuyển cảnh mượt")
-- **Dựng bộ lọc từ bất kỳ video mẫu nào**: `python scripts/make_lut.py <video-mau> <ten> [--mocs <giây,giây,…>] [--manh 0.85] [--sat 0.84]`
-  → `public/luts/<ten>.cube`. Cách làm: lấy CHẤT MÀU (độ lệch R/G/B theo từng mức sáng, tính theo phân vị) chứ KHÔNG lấy độ sáng của mẫu — copy cả độ sáng thì video quay ban ngày sẽ tối om. `--mocs` nên trỏ vào các giây CẢNH NÓI của mẫu, tránh thẻ trắng/nền màu.
-- **Đã có `mint-warm`** (học từ reel mẫu Dạng 3 — anh chỉ đúng video này 14/10: "bộ lọc phải đẹp như video này"). Kiểm chứng trên video anh: bão hoà 0,300 (mẫu 0,291) · vùng sáng ấm R−B +0,175 (mẫu +0,197) · độ sáng gốc giữ nguyên.
-- **Áp vào job**: `python scripts/grade.py <job> [--lut mint-warm] [--manh 1.0]` → `cut_graded.mp4` (tự lấy `cut_beauty.mp4` nếu có). Plan đặt `"video": "_jobs/<job>/cut_graded.mp4"` và **`"graded": true`** để renderer tắt lớp chỉnh màu CSS (không chồng 2 lần màu).
-- **Chuyển cảnh mượt**: `"softCut": 5` (số khung hoà hình giữa 2 cảnh, mặc định 5, kèm nhoè nhẹ + phóng 2%). `0` = cắt thẳng như kênh mẫu. Không áp cho thẻ (thẻ vẫn trồi/cắt như cũ) và không thay thế cháy đỏ-cam.
-- Demo: `_jobs/d4-loc/final.mp4` (14 giây: bộ lọc + 2 lần hoà cảnh + cháy đỏ-cam) · so sánh màu: `Pictures/DANG 4 - so sanh BO LOC truoc-sau.jpg`.
+Cảnh `card`, `phone`, `ladder`, `compare` phủ kín → không có chữ chạy, không có logo nhỏ trong lúc đó.
 
-## Nhịp — theo anh Phong, CHẬM hơn mẫu (xem [[feedback-dang3-chu-cham-canh-dai]])
-Mẫu: cụm chữ 0,5–1,5s, cảnh ~3,7s. Với anh: **mỗi vế chữ ≥1,2s (ưu tiên 1,5–3s), b-roll ≥3,5s, thẻ ≥2,5s**; gộp vế đệm. `make_plan.py` in độ dài cảnh và vế chữ để soát trước khi dựng.
+## Lớp phủ
+- **`captions`** — chữ 2 tầng: `lead` (dòng nhỏ ≤26 ký tự) + `punch` (cụm to ≤13 ký tự), `leadT`, `punchT`, `y`, `shade` (bóng sau chữ: 0,4 mặc định · 0,5 áo xám · 0,62 áo TRẮNG). Cả cụm bật một lần, KHÔNG màu nhấn, KHÔNG hiện từng từ.
+- **`logos`** — nhắc tới công cụ nào thì logo thật hiện **nhỏ, tinh tế** ở đỉnh khung (`y≈0,115`): `{from, to, file, name, sub}`. Nhiều logo cùng lúc tự xếp hàng ngang.
+- **`ladder`** — `{label, rungs:[{name, note, logos:[{file, t}]}]}`. **Bậc 1 nằm DƯỚI, bậc cao nhất TRÊN.** Bậc đã qua hiện lời đánh giá + logo (logo chỉ hiện khi `t ≥ logo.t`).
+- **`leaks`** — chuyển cảnh **cháy đỏ-cam** `[{t, kind:"warm"}]`: CHỈ ở mốc chuyển phần lớn hoặc ngay trước đoạn quan trọng, **tối đa 2 lần/video**.
+- `lists`, `title` (tiêu đề ghim) — có sẵn, ít dùng.
 
-## Schema `plan.json`
-```json
-{ "comp": "dang4", "video": "_jobs/<job>/cut.mp4", "durationSec": 52.8,
-  "scenes": [
-    {"kind": "talk", "from": 0, "to": 5.5, "anchorY": 0.3, "scale": 1.0},
-    {"kind": "broll", "from": 5.5, "to": 9.5, "file": "broll/x.mp4", "pos": "50% 40%"},
-    {"kind": "card", "from": 11.3, "to": 13.3, "tone": "white", "small": "tối ưu tất cả công việc", "big": "đẩy lên online", "tBig": 12.6},
-    {"kind": "card", "from": 13.3, "to": 17.5, "tone": "black", "small": "…", "big": "…", "order": "big-small"} ],
-  "captions": [ {"from": 0, "to": 3.0, "y": 0.70, "lead": "Bây giờ Phong vẫn đang cầm", "leadT": 0.0, "punch": "chiếc điện thoại", "punchT": 1.3} ],
-  "lists": [ {"from": 6, "to": 12, "title": "3 bước chính:", "items": [{"t": 7.5, "text": "1. Tạo sản phẩm"}]} ],
-  "title": {"text": "tiêu đề ghim trên đỉnh", "sub": "dòng nhỏ"},
-  "graded": true, "softCut": 5,
-  "grade": {"vignette": 0.4, "grain": 0.06},
-  "leaks": [{"t": 5.5, "kind": "warm"}],
-  "sfx": [{"t": 11.2, "file": "sfx3/swoosh.mp3", "db": -22}],
-  "music": {"name": "wholesome", "gainDb": -11, "fadeIn": 0.4, "fadeOut": 1.0} }
-```
+## ★ Luật bắt buộc
+1. **Khung an toàn TikTok.** Chữ chạy rộng tối đa 880px, chữ thẻ 920px — renderer tự thu cỡ theo BỀ NGANG THẬT (`beRong` / `fitW`, chữ HOA rộng hơn chữ thường ~27%). Cột nút phải ~170px, dưới ~300px, trên ~120px: đừng đặt chữ dưới `y = 0,90` hay trên `0,08`; thang và so sánh nằm trong `x 70…890`.
+2. **Khung mặt phải CHUẨN, chữ KHÔNG che mặt.** Chạy `do_mat.py` mỗi video: chữ chạy đặt dưới cằm thấp nhất (+0,13), tiêu đề/logo trên đỉnh đầu. Mỗi video người quay ngồi xa gần khác nhau — đừng đoán theo video cũ. Phóng khung nhẹ thôi (≤1,06) khi người ngồi gần máy.
+3. **B-roll phải là CLIP ĐỘNG, không lấy ảnh tĩnh.** Cắt đoạn vừa không đổi cảnh vừa có thao tác thật (dò độ lệch giữa 2 khung liền nhau ở 2 fps: đỉnh < 9 = không đổi cảnh, trung bình > 0,45 = có chuyển động). Clip màn hình: crop vào vùng nội dung, bỏ thanh taskbar / chữ chìm "Activate Windows". Ô facecam trong clip nguồn phải tròn vẹn hoặc cắt hẳn.
+4. **Video người dùng đã tự ghép màn hình sẵn** (soi khung trước): đoạn đó KHÔNG chèn b-roll/điện thoại, giữ `scale 1.0`, hạ chữ xuống dưới khung màn hình (~0,82–0,88), thẻ chỉ đặt ở đoạn thấy mặt.
+5. **Soát lời kỹ.** Whisper hay sai tên riêng (Claude → "Cloud", ChatGPT → "ChartBt", MCP → "MCB", Seedance → "CDN", Kling → "Carling", Higgsfield → "Hit View", vibe coding → "vai cố định"). Nghe lại chỗ nghi ngờ (cắt wav, có thể chậm 0,8×), đừng dùng `initial_prompt` liệt kê tên công cụ (Whisper sẽ bịa lại đúng danh sách đó). Một từ kéo dài > 1,5s hoặc ≥ 3 từ chung một mốc = Whisper bỏ sót / nhồi lời → đo âm lượng rồi nghe lại.
+6. **Giữ chỗ người nói lặp để nhấn mạnh**; chỉ cắt lặng và đoạn vấp thật. Soi riêng 20–30s cuối xem có đuôi thừa.
+7. **Nhịp chậm, đọng**: mỗi vế chữ ≥ 1,2s (ưu tiên 1,5–3s), b-roll ≥ 2,6s, thẻ ≥ 2,5s. Khung so sánh đừng mở trước khi nhắc mục đầu tiên quá ~1,5s.
+8. **Âm thanh**: nhạc `wholesome` −11 đến −12 dB, duck sâu; SFX tự sinh (1 lướt khi thẻ trắng trồi, 1 lướt trước mỗi lần cháy). Thành phẩm ≈ −14 LUFS.
 
 ## Quy trình
-1. `prepare.py` → đọc lời, soi sót lời. **Rồi `grade.py <job>`** (bộ lọc màu) — da thì anh tự làm ở CapCut trước khi gửi.
-2. Soi khung để đặt `anchorY`, `y`.
-3. Chia cảnh: hook mặt → cụm b-roll → thẻ chốt → lặp → thẻ đúc kết/CTA.
-4. `make_plan.py` → ≤10 khung tĩnh → `render.py`.
-5. Tự kiểm 2 khung/giây, −14 LUFS, đủ lời.
-6. Giao `OUTPUT/` + `Pictures/`, tên `… - DA EDIT Dang4.mp4`, ghi sổ, dọn file trung gian.
+1. `prepare.py` → đọc `words.json` toàn bộ: sửa chính tả, tìm từ bị nhồi/kéo dài, nghe lại tên công cụ.
+2. (Tuỳ) `trim_gaps.py` → `grade.py --manh 0.85 --net 1.0` → `do_mat.py`.
+3. Soi khung nguồn (1 khung/10s): có màn hình tự ghép không, áo màu gì (chọn `shade`).
+4. Viết `public/_jobs/<job>/make_plan.py`: sinh `plan.json` + tự soát (cảnh hở, chữ đè thẻ/thang/so sánh, logo bị che, thiếu file, clip ngắn hơn cảnh, cỡ chữ sau khi thu).
+5. Soi 6–8 khung tĩnh ở các thành phần mới → sửa → `render.py`.
+6. Kiểm thành phẩm: tấm ghép 1 khung/9–10s, âm lượng `loudnorm`, nghe lại bằng Whisper so với `words.json` (lệch khối > 2 từ = có vấn đề).
+7. Nếu một lần dựng chạy quá ~2× thời lượng bình thường mà không ra file → dừng tiến trình (`taskkill /T` theo PID của render.py) rồi chạy lại.
 
-## Giới hạn / chưa làm
-- Chưa có nét vẽ nguệch ngoạc động quanh đầu (reel D). ⚠️ Lần bóc tách đầu em SÓT tia sáng chuyển cảnh vì chỉ soi mốc cắt của reel A — học một kênh thì phải quét bừng sáng/chuyển cảnh trên MỌI video mẫu (script quét độ sáng trung bình từng khung). `lists` và `title` đã có trong renderer nhưng chưa dùng trong bản thử.
-- Mẫu quay CẬN MẶT trong nhà đèn ấm; video anh quay xa/ngoài trời thì bộ lọc chỉ kéo gần được một phần. Áo sọc/nền rối: renderer có bóng mềm sau chữ.
-- Em không nghe được nhạc: chọn `wholesome` bằng số đo (phổ + tempo ước lượng trùng mẫu). Không xác định được tên bài nhạc kênh mẫu dùng.
+## Schema `plan.json` (rút gọn)
+```json
+{ "comp": "dang4", "video": "_jobs/<job>/cut_graded.mp4", "graded": true, "durationSec": 94.2, "softCut": 5,
+  "scenes": [
+    {"kind": "talk", "from": 0, "to": 6.6, "anchorY": 0.3, "scale": 1.0},
+    {"kind": "card", "from": 6.6, "to": 10.2, "tone": "black", "small": "cả năm 2026", "big": "MẤT TIỀN", "tBig": 7.5},
+    {"kind": "photo", "from": 29.5, "to": 35.8, "file": "broll/man-hinh.mp4", "w": 0.97},
+    {"kind": "phone", "from": 35.8, "to": 41.1, "prompt": "Bật trình duyệt giúp tôi", "typeAt": 36.4, "send": 39.1, "tReply": 39.7, "reply": "Đã bật trình duyệt."},
+    {"kind": "ladder", "from": 41.1, "to": 44.0, "level": 2},
+    {"kind": "compare", "from": 44.0, "to": 48.0, "label": "VIDEO AI", "title": "SEEDANCE vs KLING",
+     "items": [{"file": "logos/seedance.svg", "name": "Seedance", "note": "Top 1"}, {"file": "logos/kling.png", "name": "Kling"}],
+     "pick": 0, "tPick": 46.5} ],
+  "captions": [{"from": 0.2, "to": 2.6, "y": 0.72, "shade": 0.5, "lead": "Một nhân viên AI", "leadT": 0.2, "punch": "vừa mang về 540 đô", "punchT": 0.95}],
+  "logos": [{"from": 12.0, "to": 18.5, "file": "logos/chatgpt.png", "name": "GPT Image 2.5", "sub": "OpenAI"}],
+  "ladder": {"label": "XẾP HẠNG", "rungs": [{"name": "TẠO ẢNH", "note": "Dễ bắt đầu nhất", "logos": [{"file": "logos/chatgpt.png", "t": 12.0}]}, {"name": "VIDEO AI"}]},
+  "leaks": [{"t": 6.6, "kind": "warm"}],
+  "music": {"name": "wholesome", "gainDb": -11, "fadeIn": 0.4, "fadeOut": 1.2} }
+```
 
-## Nhật ký
-- **15/10/2026 — LẦN ĐẦU CHẠY TRÊN VIDEO THẬT** (video 22, quay thô 95,0s → 94,19s, chủ đề dùng Subagent miễn phí trên máy). ⚠️ Hai lỗi phải nhớ: (a) `render.py` sinh SFX theo cấu trúc plan **Dạng 1** nên vỡ ngay (`captions[].punch` ở Dạng 4 là CHUỖI, thẻ nằm trong `scenes` chứ không phải `cards`) → đã thêm nhánh riêng `if plan.get("comp")=="dang4"`: 1 lướt −22 dB khi thẻ TRẮNG trồi, 1 lướt −20 dB sớm 0,15s trước mỗi `leak`. (b) Anh quay **ÁO TRẮNG** — đo độ sáng 4 dải chữ đều 159–190/255, chữ trắng chìm → đã thêm `shade` cho từng caption trong `Dang4Mono.tsx` (mặc định 0,4; video này 0,62). Luôn đo dải chữ trước khi chọn `y`. (c) B-roll kho khớp chủ đề nhất (`sa_flow`, `sa_mcp`, `sa_edit`…) đều 1280×720 — Dạng 4 phủ kín 9:16 cắt còn 405px nên MẤT HẾT chữ màn hình → chỉ dùng clip DỌC đời thật (`pm_mo_laptop`, `pm_kenhyoutube`, `pm_maytinh`), ý 'màn hình' đẩy lên thẻ chữ to. Thông số: 26 cảnh (đổi cỡ khung 1,0↔1,10 mỗi 2–5s), 36 vế chữ ngắn nhất 1,30s, 4 thẻ xen trắng–đen, 3 b-roll ≥3,56s, 2 cháy đỏ-cam (9,8s hết hook · 57,4s sang phần mục đích), nhạc `wholesome` −11 dB. Kết quả 94,2s · 45MB · −14,3 LUFS · 458/458 từ. Bộ lọc dùng `grade.py --manh 0.85 --net 1.0` (có lớp làm nét nhân vật mới). Mẫu: `_jobs/video-22/make_plan.py`.
-- **13–14/10/2026** — khởi tạo: tải 4 video kênh mẫu (2 anh gửi + 2 reel sát ngày), đo cắt cảnh/chữ/màu/âm, viết `Dang4Mono.tsx`, chọn nhạc `wholesome`, bản thử `d4-test` trên video hải đăng 52,8s (14 cảnh: 5 mặt · 5 b-roll · 4 thẻ; 21 vế chữ). ⚠️ Lệnh bash có heredoc chứa nhiều dấu nháy tiếng Việt hay lỗi → viết file bằng công cụ Write.
+## Bẫy đã gặp
+- `render.py` xoá `_props.json` khi xong → chép lại `plan.json` trước mỗi lần soi khung.
+- `transform: translateY` không đổi bố cục → muốn một khối co giãn thật thì đổi chiều cao, đừng dịch.
+- Lệnh bash có heredoc chứa tiếng Việt hay vỡ → viết script ra file rồi chạy.
+- Dò cảnh bằng `select='gt(scene,N)'` của ffmpeg trả về 0 kết quả với video quay màn hình → tự tính độ lệch khung.
+- TikTok chặn yt-dlp thường → `pip install curl_cffi` rồi thêm `--impersonate chrome`.

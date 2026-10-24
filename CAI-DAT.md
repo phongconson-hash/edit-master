@@ -23,13 +23,13 @@ ffmpeg -version
 **Windows (PowerShell):**
 
 ```
-git clone https://github.com/phongconson-hash/edit-master.git; cd edit-master\dang5-studio; npm install; pip install faster-whisper; cd ..; claude
+git clone https://github.com/phongconson-hash/edit-master.git; cd edit-master\dang5-studio; npm install; pip install faster-whisper mediapipe opencv-python; cd ..; claude
 ```
 
 **Mac / Linux:**
 
 ```
-git clone https://github.com/phongconson-hash/edit-master.git && cd edit-master/dang5-studio && npm install && pip install faster-whisper && cd .. && claude
+git clone https://github.com/phongconson-hash/edit-master.git && cd edit-master/dang5-studio && npm install && pip install faster-whisper mediapipe opencv-python && cd .. && claude
 ```
 
 Lệnh này tải kho về, cài thư viện rồi mở Claude Code ngay tại thư mục đó. Skill nằm sẵn
@@ -57,6 +57,7 @@ Thành phẩm nằm ở `dang5-studio/public/_jobs/<tên-job>/final.mp4`.
 cd dang5-studio
 python scripts/prepare.py duong-dan-video.mp4 --job video-1
 python scripts/grade.py video-1 --manh 0.85 --net 1.0
+python scripts/do_mat.py video-1
 python scripts/render.py video-1
 ```
 
@@ -76,7 +77,8 @@ npx remotion studio src/index.ts
 | Báo lỗi | Cách xử lý |
 |---|---|
 | `ffmpeg: command not found` | Chưa thêm ffmpeg vào PATH — xem lại Bước 1 |
-| `Repository not found` khi clone | Kho để riêng tư; trình duyệt phải đang đăng nhập tài khoản được cấp quyền |
+| `Repository not found` khi clone | Gõ sai địa chỉ kho — chép lại đúng lệnh ở Bước 2 |
+| `do_mat.py` báo thiếu `mediapipe` | Chạy `pip install mediapipe opencv-python` |
 | Nhận lời rất chậm lần đầu | Bình thường — đang tải mô hình nghe ~1,5 GB. Máy yếu thì thêm `--model small` |
 | `ERR_NETWORK_CHANGED` | Mạng đổi giữa chừng. `render.py` tự thử lại 3 lần; vẫn lỗi thì chạy lại |
 | `ffmpeg exited with code null` | Hết RAM — đóng bớt ứng dụng rồi chạy lại |
@@ -85,10 +87,11 @@ npx remotion studio src/index.ts
 
 ## Gói này có gì, không có gì
 
-**Có:** bộ dựng Dạng 4, các script Python, phông Inter, hạt phim, bộ lọc màu `mint-warm`,
-4 tiếng động, nhạc nền `wholesome`.
+**Có:** bộ dựng Dạng 4 (thẻ, b-roll, khung màn hình, iPhone gõ lệnh, thang xếp hạng, khung so sánh,
+logo công cụ), các script Python, phông Inter, hạt phim, bộ lọc màu `mint-warm`, 4 tiếng động,
+nhạc nền `wholesome`, 21 logo công cụ AI thường gặp (`dang5-studio/public/logos/`).
 
-**Không có:** kho b-roll, logo thương hiệu, nhạc khác, và các dạng edit khác.
+**Không có:** kho b-roll, nhạc khác, và các dạng edit khác.
 Muốn dùng b-roll thì bỏ clip vào `dang5-studio/public/broll/` rồi khai trong `plan.json`.
 
 **Ghi nguồn:** nhạc `wholesome` của Kevin MacLeod, giấy phép CC BY 4.0 — đăng video phải

@@ -14,6 +14,11 @@ Edit video talking-head kiểu reel chuyên gia/coach:
 - B-roll đời thật **phủ kín màn hình** minh hoạ câu nói
 - **Thẻ TRẮNG chữ đen / thẻ ĐEN chữ trắng** toàn màn cho câu chốt
 - Chuyển cảnh **cháy đỏ-cam**, tối đa 2 lần mỗi video
+- Clip màn hình 16:9 đặt **khung giữa nền mờ** (không mất chữ trên màn hình)
+- **Màn hình iPhone 18 Pro giả lập** gõ câu lệnh vào ChatGPT khi nói tới nhập lệnh
+- Video đánh giá/xếp hạng: **thang xếp hạng** từ thấp lên cao, **khung so sánh** có nhãn CHỌN,
+  **logo công cụ** hiện nhỏ đúng lúc nhắc tên
+- Chữ tự thu cỡ cho **lọt khung an toàn TikTok**; đo vị trí mặt để **chữ không che mặt**
 - Nhạc nền rất nhỏ, gần như không tiếng động
 
 ## Trong kho có gì
@@ -24,11 +29,11 @@ edit-master/
 ├── .claude/skills/
 │   └── video-editor-dang-4/ ← CÔNG THỨC (Claude Code tự đọc, khỏi chép đi đâu)
 │       ├── SKILL.md            quy trình, schema plan.json, nhật ký từng video
-│       └── references/         bóc tách 4 video kênh mẫu + khung hình đối chiếu
+│       └── references/         ghi chép bóc tách phong cách
 └── dang5-studio/           ← BỘ MÁY (dựng ra video thật)
     ├── src/Dang4Mono.tsx       bộ dựng Remotion
-    ├── scripts/                prepare · grade · render · trim_gaps · make_lut · beauty
-    └── public/                 phông Inter · hạt phim · bộ lọc màu · tiếng động · nhạc
+    ├── scripts/                prepare · grade · render · trim_gaps · do_mat · make_lut · beauty
+    └── public/                 phông Inter · hạt phim · bộ lọc màu · tiếng động · nhạc · logo công cụ
 ```
 
 Cần **cả hai**: thiếu công thức thì Claude không biết dựng thế nào, thiếu bộ máy thì
